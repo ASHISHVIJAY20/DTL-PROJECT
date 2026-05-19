@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Scanit - Automated Smart Attendance Management System using RFID and AI Face Verification for educational institutions.">
+  <title>Scanit - Smart Attendance Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#FBF7F0', 100:'#F5E6D8', 200:'#E8C9AD', 300:'#D4845A', 400:'#C4652A', 500:'#A8522A', 600:'#8B4324', 700:'#6E351D', 800:'#1B2A4A', 900:'#111D35' },
+            slate: { 50:'#FBF7F0', 100:'#F5EDE0', 200:'#E8DFD2', 300:'#D4C9B8', 400:'#9A9183', 500:'#6B7280', 600:'#4B5563', 700:'#374151', 800:'#1F2937', 900:'#111827' },
+            navy: { 50:'#E8EDF5', 100:'#C7D2E5', 200:'#8FA5CB', 300:'#5778B1', 400:'#2D4A7A', 500:'#1B2A4A', 600:'#162240', 700:'#111D35', 800:'#0D1729', 900:'#08101D' },
+            terra: { 50:'#FDF5EF', 100:'#F9E6D6', 200:'#F2C9A9', 300:'#E8A574', 400:'#D4845A', 500:'#C4652A', 600:'#A8522A', 700:'#8B4324', 800:'#6E351D', 900:'#512716' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-sans bg-slate-50 text-slate-800">
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" id="modal-body" onclick="event.stopPropagation()"></div>
+  </div>
+
+  <!-- Mobile sidebar overlay -->
+  <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-30" onclick="toggleMobileSidebar()"></div>
+
+  <!-- ============ PUBLIC HEADER ============ -->
+  <header id="public-header" class="nav-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+      <a href="#" onclick="navigateTo('landing')" class="flex items-center gap-2 text-white font-bold text-xl tracking-tight">
+        <div class="w-8 h-8 bg-gradient-to-br from-terra-500 to-terra-300 rounded-lg flex items-center justify-center">
+          <i class="fas fa-fingerprint text-sm"></i>
+        </div>
+        Scanit
+      </a>
+      <nav class="hidden md:flex items-center gap-6">
+        <a onclick="navigateTo('landing')" class="text-slate-300 hover:text-white text-sm font-medium cursor-pointer transition-colors">Home</a>
+        <a onclick="navigateTo('features')" class="text-slate-300 hover:text-white text-sm font-medium cursor-pointer transition-colors">Features</a>
+        <a onclick="navigateTo('pricing')" class="text-slate-300 hover:text-white text-sm font-medium cursor-pointer transition-colors">Pricing</a>
+        <a onclick="navigateTo('pricing')" class="text-slate-300 hover:text-white text-sm font-medium cursor-pointer transition-colors">Contact</a>
+        <button onclick="navigateTo('pricing')" class="text-sm font-medium text-terra-400 hover:text-blue-300 cursor-pointer transition-colors">Request Demo</button>
+        <button onclick="navigateTo('login')" class="btn-primary btn-sm">
+          <i class="fas fa-arrow-right-to-bracket"></i> Login
+        </button>
+      </nav>
+      <button class="md:hidden text-white text-xl" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-700 px-4 py-3 space-y-2">
+      <a onclick="navigateTo('landing')" class="block text-slate-300 hover:text-white text-sm py-2 cursor-pointer">Home</a>
+      <a onclick="navigateTo('features')" class="block text-slate-300 hover:text-white text-sm py-2 cursor-pointer">Features</a>
+      <a onclick="navigateTo('pricing')" class="block text-slate-300 hover:text-white text-sm py-2 cursor-pointer">Pricing</a>
+      <a onclick="navigateTo('login')" class="block text-terra-400 hover:text-blue-300 text-sm py-2 cursor-pointer font-semibold">Login →</a>
+    </div>
+  </header>
+
+  <!-- ============ DASHBOARD SIDEBAR ============ -->
+  <aside id="dashboard-sidebar" class="sidebar hidden">
+    <div class="p-4 border-b border-slate-700/50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-gradient-to-br from-terra-500 to-terra-300 rounded-lg flex items-center justify-center">
+            <i class="fas fa-fingerprint text-sm text-white"></i>
+          </div>
+          <span class="font-bold text-lg text-white tracking-tight">Scanit</span>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Role badge -->
+    <div class="px-4 py-3 border-b border-slate-700/50">
+      <div id="sidebar-role-badge" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-blue-500/15 text-terra-400 text-center"></div>
+    </div>
+    <!-- Nav links -->
+    <nav id="sidebar-nav" class="p-2 space-y-1 mt-2"></nav>
+    <!-- Bottom section -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700/50">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-terra-500 to-terra-300 flex items-center justify-center text-white font-bold text-sm" id="sidebar-avatar">SA</div>
+        <div>
+          <div class="text-sm font-medium text-white" id="sidebar-username">Super Admin</div>
+          <div class="text-xs text-slate-400" id="sidebar-email">admin@scanit.io</div>
+        </div>
+      </div>
+      <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 text-sm transition-colors">
+        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ DASHBOARD TOP BAR ============ -->
+  <header id="dashboard-topbar" class="hidden fixed top-0 right-0 h-16 bg-white border-b border-slate-200 z-30 flex items-center justify-between px-6" style="left: 260px;">
+    <div class="flex items-center gap-4">
+      <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-600 text-lg">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h2 id="topbar-title" class="text-lg font-semibold text-slate-800"></h2>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+        <i class="fas fa-clock"></i>
+        <span id="topbar-time"></span>
+      </div>
+      <div class="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full" id="latency-badge">
+        <i class="fas fa-bolt"></i> <span>Latency: 1.2s</span>
+      </div>
+      <button class="relative text-slate-500 hover:text-slate-700">
+        <i class="fas fa-bell text-lg"></i>
+        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center font-bold">3</span>
+      </button>
+      <!-- Role Switcher -->
+      <div class="relative">
+        <button onclick="document.getElementById('role-dropdown').classList.toggle('hidden')" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 transition-colors">
+          <i class="fas fa-users-gear"></i>
+          <span id="current-role-label">Switch Role</span>
+          <i class="fas fa-chevron-down text-xs"></i>
+        </button>
+        <div id="role-dropdown" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50">
+          <div class="px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Switch Dashboard</div>
+          <button onclick="switchRole('superadmin')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><i class="fas fa-shield-halved text-navy-500 w-5"></i> Super Admin</button>
+          <button onclick="switchRole('institutionadmin')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><i class="fas fa-building-columns text-terra-500 w-5"></i> Institution Admin</button>
+          <button onclick="switchRole('faculty')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><i class="fas fa-chalkboard-user text-amber-500 w-5"></i> Faculty</button>
+          <button onclick="switchRole('student')" class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"><i class="fas fa-user-graduate text-slate-600 w-5"></i> Student</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ MAIN CONTENT AREA ============ -->
+  <main id="main-content"></main>
+
+  <!-- ============ PUBLIC FOOTER ============ -->
+  <footer id="public-footer" class="footer-gradient text-slate-400 hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 bg-gradient-to-br from-terra-500 to-terra-300 rounded-lg flex items-center justify-center">
+              <i class="fas fa-fingerprint text-sm text-white"></i>
+            </div>
+            <span class="font-bold text-lg text-white tracking-tight">Scanit</span>
+          </div>
+          <p class="text-sm leading-relaxed">Next-generation smart attendance management for educational institutions. Powered by RFID and AI face verification.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Product</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a onclick="navigateTo('features')" class="hover:text-white cursor-pointer transition-colors">Features</a></li>
+            <li><a onclick="navigateTo('pricing')" class="hover:text-white cursor-pointer transition-colors">Pricing</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Integrations</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">API Documentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Company</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a class="hover:text-white cursor-pointer transition-colors">About Us</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Careers</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Blog</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Legal</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a class="hover:text-white cursor-pointer transition-colors">Privacy Policy</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Terms of Service</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">Data Protection</a></li>
+            <li><a class="hover:text-white cursor-pointer transition-colors">GDPR Compliance</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 pt-8 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <p class="text-sm">&copy; 2026 Scanit Technologies Pvt. Ltd. All rights reserved.</p>
+        <div class="flex gap-4">
+          <a class="hover:text-white transition-colors cursor-pointer"><i class="fab fa-twitter"></i></a>
+          <a class="hover:text-white transition-colors cursor-pointer"><i class="fab fa-linkedin-in"></i></a>
+          <a class="hover:text-white transition-colors cursor-pointer"><i class="fab fa-github"></i></a>
+          <a class="hover:text-white transition-colors cursor-pointer"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="mockdata.js"></script>
+  <script src="views-public.js"></script>
+  <script src="views-superadmin.js"></script>
+  <script src="views-instadmin.js"></script>
+  <script src="views-users.js"></script>
+  <script src="views-interactive.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
