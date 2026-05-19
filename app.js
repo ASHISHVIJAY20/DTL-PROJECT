@@ -105,7 +105,8 @@ function renderView() {
     'ia-command': renderIACommand, 'ia-academic': renderIAAcademic, 'ia-devices': renderIADevices,
     'f-workspace': renderFWorkspace, 'f-classroom': renderFClassroom,
     'st-dashboard': renderSTDashboard, 'st-history': renderSTHistory,
-    'pipeline': renderPipeline, 'reports': renderReports, 'audit': renderAudit
+    'pipeline': renderPipeline, 'reports': renderReports, 'audit': renderAudit,
+    'rfid-scanner': renderRFIDScanner
   };
   if (views[v]) views[v](main);
 }
@@ -119,6 +120,7 @@ const sidebarConfigs = {
       { id: 'sa-overview', icon: 'fa-chart-line', label: 'Overview Analytics' },
       { id: 'sa-institutions', icon: 'fa-building-columns', label: 'Institutions' },
       { id: 'sa-hardware', icon: 'fa-microchip', label: 'Global Hardware' },
+      { id: 'rfid-scanner', icon: 'fa-wifi', label: 'RFID Scanner' },
       { divider: true },
       { id: 'pipeline', icon: 'fa-diagram-project', label: 'AI Pipeline' },
       { id: 'reports', icon: 'fa-file-chart-column', label: 'Reports Engine' },
@@ -132,6 +134,7 @@ const sidebarConfigs = {
       { id: 'ia-command', icon: 'fa-gauge-high', label: 'Command Center' },
       { id: 'ia-academic', icon: 'fa-graduation-cap', label: 'Academic Directory' },
       { id: 'ia-devices', icon: 'fa-server', label: 'Device Operations' },
+      { id: 'rfid-scanner', icon: 'fa-wifi', label: 'RFID Scanner' },
       { divider: true },
       { id: 'pipeline', icon: 'fa-diagram-project', label: 'AI Pipeline' },
       { id: 'reports', icon: 'fa-file-chart-column', label: 'Reports Engine' },
@@ -144,6 +147,7 @@ const sidebarConfigs = {
     links: [
       { id: 'f-workspace', icon: 'fa-desktop', label: 'Daily Workspace' },
       { id: 'f-classroom', icon: 'fa-users-rectangle', label: 'Classroom Monitor' },
+      { id: 'rfid-scanner', icon: 'fa-wifi', label: 'RFID Scanner' },
       { divider: true },
       { id: 'pipeline', icon: 'fa-diagram-project', label: 'AI Pipeline' },
       { id: 'reports', icon: 'fa-file-chart-column', label: 'Reports' }
@@ -183,7 +187,8 @@ function updateTopbar() {
     'ia-command': 'Command Center', 'ia-academic': 'Academic Directory', 'ia-devices': 'Device Operations',
     'f-workspace': 'Daily Workspace', 'f-classroom': 'Classroom Monitor',
     'st-dashboard': 'My Dashboard', 'st-history': 'History Logs',
-    'pipeline': 'AI Verification Pipeline', 'reports': 'Reports & Analytics', 'audit': 'System Audit Logs'
+    'pipeline': 'AI Verification Pipeline', 'reports': 'Reports & Analytics', 'audit': 'System Audit Logs',
+    'rfid-scanner': 'RFID Scanner & Card Management'
   };
   document.getElementById('topbar-title').textContent = titles[App.currentView] || 'Dashboard';
 }
